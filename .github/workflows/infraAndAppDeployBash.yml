@@ -62,7 +62,7 @@ jobs:
 
       - name: npm install and build
         run: |
-          cd code/ui 
+          cd code/ui/my-react-app 
           npm install
           npm run build
 
@@ -72,7 +72,7 @@ jobs:
 
       - name: zip files
         run: |
-          cd code/ui/build
+          cd code/ui/my-react-app/build
           zip -r ../build.zip .
       
       - name: deploy to azure web app
