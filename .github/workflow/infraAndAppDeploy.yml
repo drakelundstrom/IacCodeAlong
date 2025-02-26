@@ -1,0 +1,95 @@
+# Make sure not to name your pipeline deploy, as this will conflict with the built-in deploy action
+name: deploy infra and app using github functions
+on:
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - main
+env:
+  AZURE_WEBAPP_NAME: BewareTheAzureDragon
+  AZURE_APPSERVICE_PLAN: front-end-app-service-plan
+  NODE_VERSION: "20.x"
+jobs:
+  validate-credentials:
+    name: validate azure credentials
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@main
+
+      - name: Log in to Azure
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+# generate credentials using this command, then store them in GitHub secrets
+# az ad sp create-for-rbac --name "pipelineCredentials" --role contributor --scopes /subscriptions/{subscription-id}/resourceGroups/{resource-group} 
+
+      - name: logout
+        run: |
+          az logout
+
+  build-infrastructure:
+    name: build infrastructure
+    needs: validate-credentials
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@main
+
+      - name: Log in to Azure
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+      
+      - name: build infrastructure
+        uses: azure/arm-deploy@v1
+        with:
+          scope: resourcegroup
+          resourceGroupName: 'IacReferenceForCodeAlong'
+          deploymentMode: incremental
+          template: ./infra/main.bicep
+          parameters: ./infra/main.dev.bicepparam
+
+  build-app:
+    name: build react app
+    needs: build-infrastructure
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@main
+
+      - name: Use node.js ${{env.NODE_VERSION}}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{env.NODE_VERSION}}
+
+      - name: npm install and build
+        run: |
+          cd code/ui 
+          npm install
+          npm run build
+
+      - name: upload build artifacts
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: frontend-app
+          path: "code/ui/build"
+          if-no-files-found: error
+          retention-days: 30
+
+  deploy-app:
+    name: deploy react app
+    needs: build-app
+    runs-on: ubuntu-latest
+    steps:
+      - name: Log in to Azure
+        run: |
+          az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+
+      - name: downloading artifact
+        uses: actions/download-artifact@v2
+
+      - name: deploy to azure web app
+        id: deploy-to-web-app
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{env.AZURE_WEBAPP_NAME}}
+          package: ./frontend-app
