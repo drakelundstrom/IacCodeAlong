@@ -2,9 +2,9 @@
 name: deploy infra and app using a mix of bash and github actions
 on:
   workflow_dispatch:
-  # push:
-  #   branches:
-  #     - main
+  push:
+    branches:
+      - DemoTestBranch
 env:
   AZURE_WEBAPP_NAME: BewareTheAzureDragon
   AZURE_APPSERVICE_PLAN: front-end-app-service-plan
