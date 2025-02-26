@@ -83,11 +83,14 @@ jobs:
 
       - name: downloading artifact
         uses: actions/download-artifact@v4
+        with:
+          name: website
+          path: website
 
       - name: zip files
         run: |
-          cd ./frontend-app
-          zip -r ../frontend-app.zip .
+          cd website
+          zip -r ../website.zip .
       
       - name: deploy to azure web app
         id: deploy-to-web-app
@@ -96,4 +99,4 @@ jobs:
           az webapp deployment source config-zip \
             --resource-group 'IacReferenceForCodeAlong' \
             --name ${{env.AZURE_WEBAPP_NAME}} \
-            --src ./frontend-app.zip
+            --src ./website.zip

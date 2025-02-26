@@ -84,10 +84,13 @@ jobs:
 
       - name: downloading artifact
         uses: actions/download-artifact@v4
+        with:
+          name: website
+          path: website
 
       - name: deploy to azure web app
         id: deploy-to-web-app
         uses: azure/webapps-deploy@v4
         with:
           app-name: ${{env.AZURE_WEBAPP_NAME}}
-          package: ./frontend-app
+          package: ./website
