@@ -46,7 +46,7 @@ jobs:
           resourceGroupName: 'IacReferenceForCodeAlong'
           deploymentMode: incremental
           template: ./infra/main.bicep
-          parameters: ./infra/main.dev.bicepparam
+          parameters: ./infra/main.parameters.json
 
   build-app:
     name: build react app
