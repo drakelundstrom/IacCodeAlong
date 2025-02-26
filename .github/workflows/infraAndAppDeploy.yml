@@ -40,7 +40,7 @@ jobs:
           az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
       
       - name: build infrastructure
-        uses: azure/arm-deploy@v1
+        uses: azure/arm-deploy@v4
         with:
           scope: resourcegroup
           resourceGroupName: 'IacReferenceForCodeAlong'
@@ -57,7 +57,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Use node.js ${{env.NODE_VERSION}}
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v4
         with:
           node-version: ${{env.NODE_VERSION}}
 
@@ -67,13 +67,11 @@ jobs:
           npm install
           npm run build
 
-      - name: upload build artifacts
-        uses: actions/upload-artifact@v2.2.4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
-          name: frontend-app
-          path: "code/ui/build"
-          if-no-files-found: error
-          retention-days: 30
+          name: website
+          path: code/ui/my-react-app/dist/
 
   deploy-app:
     name: deploy react app
@@ -85,11 +83,11 @@ jobs:
           az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
 
       - name: downloading artifact
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v4
 
       - name: deploy to azure web app
         id: deploy-to-web-app
-        uses: azure/webapps-deploy@v2
+        uses: azure/webapps-deploy@v4
         with:
           app-name: ${{env.AZURE_WEBAPP_NAME}}
           package: ./frontend-app
