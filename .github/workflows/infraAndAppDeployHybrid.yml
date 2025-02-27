@@ -24,4 +24,25 @@ jobs:
             - name: logout
               run: |
                 az logout
-      
+
+    build-infrastructure:
+        name: build infrastructure
+        needs: validate-credentials
+        runs-on: ubuntu-latest
+        steps: 
+            - name: checkout
+              uses: actions/checkout@main
+
+            - name: Log in to Azure
+              run: |
+                az login --service-principal -u ${{ secrets.AZURE_CLIENT_ID }} -p ${{ secrets.AZURE_CLIENT_SECRET }} --tenant ${{ secrets.AZURE_TENANT_ID }}
+  
+            - name: build infrastructure
+              run: |
+                    az deployment group create \
+                      --resource-group 'IacReferenceForCodeAlong' \
+                      --template-file './infra/main.bicep' \
+                      --parameters '@./infra/main.parameters.json' \
+                      --parameters appName=${{env.AZURE_WEBAPP_NAME}} appServicePlanName=${{env.AZURE_APPSERVICE_PLAN}} 
+            
+                      
