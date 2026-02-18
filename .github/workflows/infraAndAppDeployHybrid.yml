@@ -43,8 +43,7 @@ jobs:
         run: |
               az deployment group create \
                 --resource-group 'IacReferenceForCodeAlong' \
-                --template-file './infra/main.bicep' \
-                --parameters '@./infra/main.parameters.json' \
+                --parameters './infra/main.bicepparam' \
                 --parameters appName=${{env.AZURE_WEBAPP_NAME}} appServicePlanName=${{env.AZURE_APPSERVICE_PLAN}} 
   
   build-app:
