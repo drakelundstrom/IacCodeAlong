@@ -8,14 +8,14 @@ on:
 env:
   AZURE_WEBAPP_NAME: BewareTheAzureDragon
   AZURE_APPSERVICE_PLAN: front-end-app-service-plan
-  NODE_VERSION: "20.x"
+  NODE_VERSION: "24.x"
 jobs:
   validate-credentials:
     name: validate azure credentials
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v6
 
       - name: Log in to Azure
         run: |
@@ -33,7 +33,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v6
 
       - name: Log in to Azure
         run: |
@@ -53,10 +53,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout
-        uses: actions/checkout@main
+        uses: actions/checkout@v6
 
       - name: Use node.js ${{env.NODE_VERSION}}
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
           node-version: ${{env.NODE_VERSION}}
 
