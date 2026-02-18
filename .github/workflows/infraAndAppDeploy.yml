@@ -1,9 +1,9 @@
 name: Infra and App Deploy
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
-    workflow_dispatch:
 env:
   AZURE_WEBAPP_NAME: BewareTheAzureDragon
   AZURE_APPSERVICE_PLAN: front-end-app-service-plan
