@@ -40,7 +40,7 @@ jobs:
               az deployment group create \
                 --resource-group 'OSUDemo' \
                 --parameters './infra/main.bicepparam' \
-                --parameters appName=${{env.AZURE_WEBAPP_NAME}} appServicePlanName=${{env.AZURE_APPSERVICE_PLAN}} 
+                --parameters webAppName=${{env.AZURE_WEBAPP_NAME}} appServicePlanName=${{env.AZURE_APPSERVICE_PLAN}} 
   build-app:
     name: build react app
     needs: build-infrastructure
